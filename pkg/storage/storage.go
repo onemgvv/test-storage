@@ -1,6 +1,8 @@
 package storage
 
-import "time"
+import (
+	"time"
+)
 
 type Storage struct {
 	data StorageMap

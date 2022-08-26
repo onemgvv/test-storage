@@ -49,7 +49,7 @@ func (h *Handler) storageSetter(w http.ResponseWriter, r *http.Request) {
 			body.TTL = h.config.Storage.DefaultTTL
 		}
 
-		h.storage.Add(body.Key, body.Value, body.TTL * time.Minute)
+		h.storage.Add(body.Key, body.Value, body.TTL)
 
 		data, _ := json.Marshal(map[string]int{ "success": 1 })
 		w.Write(data)
