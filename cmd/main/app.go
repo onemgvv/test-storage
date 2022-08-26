@@ -29,7 +29,7 @@ func main() {
 	store.Init()
 
 	// HTTP Server init
-	handler := handler.NewHandler(store)
+	handler := handler.NewHandler(&store, &c)
 	app := server.NewServer(&c, handler.Init())
 
 	// Run app

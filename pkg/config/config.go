@@ -20,6 +20,7 @@ type (
 	Config struct {
 		HTTP    HTTPConfig    `json:"http"`
 		Limiter LimiterConfig `json:"limiter"`
+		Storage StorageConfig `json:"storage"`
 	}
 
 	HTTPConfig struct {
@@ -38,6 +39,10 @@ type (
 		Burst int           `json:"burst"`
 		TTL   time.Duration `json:"ttl"`
 	}
+
+	StorageConfig struct {
+		DefaultTTL time.Duration `json:"defaultTTL"`
+	}
 )
 
 func (c *Config) Init(path string) error {
@@ -51,6 +56,11 @@ func (c *Config) Init(path string) error {
 	if err = json.Unmarshal(jsonFile, &c); err != nil {
 		return err
 	}
+
+	c.Limiter.TTL *= time.Minute
+	c.HTTP.Timeouts.Read *= time.Second
+	c.HTTP.Timeouts.Write *= time.Second
+	c.Storage.DefaultTTL *= time.Minute
 
 	return nil
 }

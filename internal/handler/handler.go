@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"test-storage/pkg/config"
 	"test-storage/pkg/storage"
 	"time"
 )
@@ -15,11 +16,13 @@ type SetterBody struct{
 
 type Handler struct{
 	storage *storage.Storage
+	config *config.Config
 }
 
-func NewHandler(storage storage.Storage) *Handler {
+func NewHandler(storage *storage.Storage, cfg *config.Config) *Handler {
 	return &Handler{
-		storage: &storage,
+		storage: storage,
+		config: cfg,
 	}
 }
 
@@ -40,6 +43,10 @@ func (h *Handler) storageSetter(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return 
+		}
+
+		if body.TTL == 0 {
+			body.TTL = h.config.Storage.DefaultTTL
 		}
 
 		h.storage.Add(body.Key, body.Value, body.TTL * time.Minute)
