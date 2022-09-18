@@ -1,36 +1,41 @@
 package storage
 
 import (
+	"sync"
 	"time"
 )
 
 type Storage struct {
-	data StorageMap
+	sync.RWMutex
+	data storageMap
 }
 
-type StorageData struct {
+type storageData struct {
 	Value any
 	TTL   time.Duration
 }
 
-type StorageMap map[string]StorageData
+type storageMap map[string]storageData
 
 func (s *Storage) Init() {
-	sMap := StorageMap{}
+	sMap := storageMap{}
 	s.data = sMap
 }
 
 func (s *Storage) Add(key string, value any, ttl time.Duration) {
-	sData := StorageData{
+	sData := storageData{
 		Value: value,
-		TTL: ttl,
+		TTL:   ttl,
 	}
-
+	s.Lock()
 	s.data[key] = sData
+	s.Unlock()
 	go s.clearData(key, ttl)
 }
 
-func (s *Storage) Get(key string) StorageData {
+func (s *Storage) Get(key string) storageData {
+	s.RLock()
+	s.RUnlock()
 	return s.data[key]
 }
 
